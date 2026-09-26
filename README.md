@@ -1,8 +1,12 @@
 # BIP Rocket Data Acquisition & Telemetry
 
-ESP32-S3 based model-rocket data acquisition project developed during the **SENSATE-X Darmstadt Rockets BIP (July 2025)** as part of a four-person international engineering team.
+ESP32-S3 based model-rocket data acquisition project developed in the **Arduino IDE** during the **SENSATE-X Darmstadt Rockets BIP (July 2025)** as part of a four-person international engineering team.
 
 My main responsibility was embedded programming and telemetry/data acquisition.
+
+![ESP32-S3 telemetry display](docs/images/rocket_display.jpg)
+
+A surviving short display demonstration is included at `docs/video/display_demo.mp4`.
 
 ## Project goal
 
@@ -30,13 +34,11 @@ flowchart LR
     S --> P[Post-flight analysis / visualisation]
 ```
 
-## What happened during development
+## Telemetry and data logging
 
 The initial plan used two SX1262 LoRa modules: one onboard the rocket and one at the ground station.
 
-Reliable LoRa communication was not achieved within the project timeframe, so the design was adapted to **onboard microSD logging** to make sure flight data could still be captured. This was an important engineering trade-off: preserve the primary data-acquisition objective even when the preferred communications path was not reliable.
-
-Recorded data included barometric/altitude information and acceleration data, with velocity estimated/derived during post-flight analysis.
+Reliable LoRa communication was not achieved within the project timeframe, so the design was adapted to **onboard microSD logging** to make sure flight data could still be captured. Recorded data included barometric/altitude information and acceleration data, with velocity estimated/derived during post-flight analysis.
 
 ## Board configuration used during the BIP
 
@@ -58,16 +60,15 @@ Recorded data included barometric/altitude information and acceleration data, wi
 
 The **original 2025 team flight firmware was not retained**.
 
-Code under `src/reconstructed/` was recreated in September 2026 from:
+The Arduino sketch under `src/reconstructed/` was recreated in September 2026 from:
 
 - the known project hardware
 - BIP course starter material and sensor examples
 - surviving project notes
-- the project description and surviving display video
+- the project description
+- the surviving TFT display video/photo
 
 It is included as a **reference reconstruction**, not as a claim that this is the exact firmware flown in 2025.
-
-This distinction is intentional: the repository documents the engineering project without inventing a false source-code history.
 
 ## Reconstructed reference implementation
 
@@ -85,9 +86,9 @@ The microSD chip-select pin depends on the breakout wiring and must be set befor
 
 `tools/analyse_flight.py` reads the CSV logger output and derives a simple velocity estimate from altitude versus time. It also plots altitude, estimated velocity and acceleration magnitude.
 
-## Engineering lessons
+## Repository structure
 
-- Designing for graceful fallback matters in time-constrained projects.
-- Telemetry and data acquisition should be separable: loss of a radio link should not mean loss of the flight data.
-- Sensor sample rate, storage capacity and logging format need to be considered before flight.
-- Barometric altitude and IMU acceleration provide complementary measurements with different error sources.
+- `src/reconstructed/flight_logger.ino` — clearly labelled reference reconstruction
+- `tools/analyse_flight.py` — CSV post-flight analysis utility
+- `docs/images/rocket_display.jpg` — surviving display image
+- `docs/video/display_demo.mp4` — surviving display demonstration
