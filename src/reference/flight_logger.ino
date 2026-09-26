@@ -1,13 +1,5 @@
-/*
- * Reconstructed reference implementation for the 2025 SENSATE-X
- * Darmstadt rocket data-acquisition project.
- *
- * IMPORTANT:
- * This is NOT represented as the original 2025 flight firmware.
- * The original team source was not retained. This implementation was
- * recreated in 2026 from the known hardware, course starter material,
- * project notes and surviving project media.
- */
+// Reference sketch recreated from the hardware setup and surviving project material.
+// The original 2025 team sketch was not retained.
 
 #include <Arduino.h>
 #include <Wire.h>
@@ -18,7 +10,6 @@
 #include <Adafruit_BMP280.h>
 #include <SensorQMI8658.hpp>
 
-// ---------------- Board configuration ----------------
 #define TFT_CS         7
 #define TFT_DC         39
 #define TFT_RST        40
@@ -34,11 +25,8 @@
 #define BMP_ADDR       0x77
 #define QMI_ADDR       0x6B
 
-// The original microSD breakout CS wiring was not retained.
-// Change this value to match the physical breakout connection.
-#define SD_CS_PIN      10
+#define SD_CS_PIN      10  // set this to match the SD breakout wiring
 
-// Approximate project logging rate.
 constexpr uint32_t SAMPLE_INTERVAL_MS = 50; // 20 Hz
 
 Adafruit_ST7789 tft(TFT_CS, TFT_DC, TFT_RST);
@@ -134,8 +122,6 @@ void setup() {
     while (true) delay(1000);
   }
 
-  // Establish a relative launch-pad altitude.
-  // 1013.25 hPa is only a reference; relative altitude is the useful value here.
   launchAltitudeM = bmp.readAltitude(1013.25f);
 
   if (!initStorage()) {
@@ -179,7 +165,6 @@ void loop() {
       gyr.x, gyr.y, gyr.z
     );
 
-    // Periodic flush reduces data-loss risk while avoiding a write on every sample.
     static uint8_t flushCounter = 0;
     if (++flushCounter >= 20) {
       logFile.flush();
@@ -187,7 +172,6 @@ void loop() {
     }
   }
 
-  // Compact live display
   tft.fillScreen(ST77XX_BLACK);
   tft.setCursor(0, 0);
   tft.setTextColor(ST77XX_CYAN);

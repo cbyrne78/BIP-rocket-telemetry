@@ -1,46 +1,28 @@
-# BIP Rocket Data Acquisition & Telemetry
+# BIP Rocket Data Acquisition
 
-ESP32-S3 based model-rocket data acquisition project developed in the **Arduino IDE** during the **SENSATE-X Darmstadt Rockets BIP (July 2025)** as part of a four-person international engineering team.
+Model-rocket data logging project from the **SENSATE-X Darmstadt Rockets BIP (July 2025)**. I worked mainly on the Arduino/ESP32-S3 side of the project.
 
-My main responsibility was embedded programming and telemetry/data acquisition.
+![ESP32-S3 display](docs/images/rocket_display.jpg)
 
-![ESP32-S3 telemetry display](docs/images/rocket_display.jpg)
+A short video of the display is in `docs/video/display_demo.mp4`.
 
-A surviving short display demonstration is included at `docs/video/display_demo.mp4`.
+## Hardware
 
-## Project goal
+- TS-ESP32-S3 development board
+- BMP280 pressure sensor
+- QMI8658C IMU
+- 1.14 inch TFT display
+- two Waveshare Core1262-HF SX1262 LoRa modules
+- microSD card and SPI breakout
+- LiPo battery
 
-Build an onboard system capable of recording flight data from a model rocket and making the results available for post-flight analysis.
+## Project setup
 
-The project used:
+The original plan was to send data over LoRa from the rocket to a ground station. We could not get the radio link reliable enough during the BIP, so I changed the system to log data onboard to the microSD card instead.
 
-- **TS-ESP32-S3** development board
-- onboard **BMP280** barometric pressure sensor
-- onboard **QMI8658C** accelerometer / gyroscope
-- onboard **1.14 inch TFT display**
-- **Waveshare Core1262-HF (SX1262, EU868)** LoRa modules
-- microSD card + SPI breakout
-- small LiPo battery
+The logged data included altitude/pressure and acceleration, with velocity estimated afterwards from the recorded flight data.
 
-## Architecture
-
-```mermaid
-flowchart LR
-    B[BMP280 pressure] --> E[ESP32-S3]
-    I[QMI8658C IMU] --> E
-    E --> T[1.14 inch TFT]
-    E --> L[LoRa SX1262 - investigated]
-    E --> S[microSD logging - final fallback]
-    S --> P[Post-flight analysis / visualisation]
-```
-
-## Telemetry and data logging
-
-The initial plan used two SX1262 LoRa modules: one onboard the rocket and one at the ground station.
-
-Reliable LoRa communication was not achieved within the project timeframe, so the design was adapted to **onboard microSD logging** to make sure flight data could still be captured. Recorded data included barometric/altitude information and acceleration data, with velocity estimated/derived during post-flight analysis.
-
-## Board configuration used during the BIP
+## Board connections
 
 | Function | Pin / Address |
 |---|---|
@@ -56,39 +38,8 @@ Reliable LoRa communication was not achieved within the project timeframe, so th
 | BMP280 | 0x77 |
 | QMI8658C | 0x6B |
 
-## Repository provenance
+## Arduino sketch
 
-The **original 2025 team flight firmware was not retained**.
+The original 2025 team sketch is no longer available. The sketch in `src/reference/` was recreated from the hardware setup, course examples and the project material I still had. It is there to document the system rather than represent the exact code flown in 2025.
 
-The Arduino sketch under `src/reconstructed/` was recreated in September 2026 from:
-
-- the known project hardware
-- BIP course starter material and sensor examples
-- surviving project notes
-- the project description
-- the surviving TFT display video/photo
-
-It is included as a **reference reconstruction**, not as a claim that this is the exact firmware flown in 2025.
-
-## Reconstructed reference implementation
-
-`src/reconstructed/flight_logger.ino` demonstrates the core architecture that can be reproduced from the surviving material:
-
-1. initialise the TFT, BMP280 and QMI8658C
-2. sample pressure/altitude and acceleration
-3. display live status
-4. log timestamped samples to CSV on microSD
-5. preserve the data for post-flight analysis
-
-The microSD chip-select pin depends on the breakout wiring and must be set before use.
-
-## Post-flight analysis
-
-`tools/analyse_flight.py` reads the CSV logger output and derives a simple velocity estimate from altitude versus time. It also plots altitude, estimated velocity and acceleration magnitude.
-
-## Repository structure
-
-- `src/reconstructed/flight_logger.ino` — clearly labelled reference reconstruction
-- `tools/analyse_flight.py` — CSV post-flight analysis utility
-- `docs/images/rocket_display.jpg` — surviving display image
-- `docs/video/display_demo.mp4` — surviving display demonstration
+Development environment: **Arduino IDE (ESP32-S3)**
